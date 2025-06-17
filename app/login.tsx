@@ -12,6 +12,7 @@ import CustomButton from '../components/CustomButton';
 import CustomSwitch from '../components/CustomSwitch';
 import SwitchGroup from '../components/SwitchGroup';
 import Selectbox from '../components/CustomSelectbox';
+import IconContainer from '../components/IconContainer';
 // import CustomButton from '../components/CustomButton';
 
 export default function Login() {
@@ -59,21 +60,7 @@ export default function Login() {
                     <Button text="Войти" isLoading={isLoading} onPress={submit} />
                 </View>
                 <View style={styles.gap}>
-                    <Selectbox
-                        size={44}
-                        label="Your Label"
-                        disabled={false}
-                        error={true}
-                        options={[
-                            { label: 'Option 1', value: '1' },
-                            { label: 'Option 2', value: '2' },
-                            { label: 'Option 3', value: '3' },
-                            { label: 'Option 4', value: '4' },
-                        ]}
-                        selectedValue={selectedValue}
-                        onValueChange={(value) => setSelectedValue(value)}
-                        placeholder="Выберите что-нибудь"
-                    />
+                    <IconContainer />
                 </View>
                 <CustomLink href={'/restore'} text="Восстановить пароль" />
             </View>
