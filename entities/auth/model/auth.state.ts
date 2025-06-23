@@ -1,9 +1,9 @@
+import { createJSONStorage, atomWithStorage } from 'jotai/utils';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios, { AxiosError } from 'axios';
 import { atom } from 'jotai';
-import { atomWithStorage, createJSONStorage } from 'jotai/utils';
-import { IAuthResponse } from './auth.interfaces';
+import axios, { AxiosError } from 'axios';
 import { API } from '../api/api';
+import { AuthResponse, LoginRequest } from './auth.interfaces';
 
 const storage = createJSONStorage<AuthState>(() => AsyncStorage);
 
@@ -15,6 +15,10 @@ const INITIAL_STATE = {
 
 export const authAtom = atomWithStorage<AuthState>('auth', INITIAL_STATE, storage);
 
+export const logoutAtom = atom(null, (_get, set) => {
+    set(authAtom, INITIAL_STATE);
+});
+
 export const loginAtom = atom(
     (get) => get(authAtom),
     async (_get, set, { email, password }: LoginRequest) => {
@@ -23,40 +27,36 @@ export const loginAtom = atom(
             access_token: null,
             error: null,
         });
-
         try {
-            const { data } = await axios.post<IAuthResponse>(API.login, {
+            await new Promise<void>((resolve) =>
+                setTimeout(() => {
+                    resolve();
+                }, 2000),
+            );
+            const { data } = await axios.post<AuthResponse>(API.login, {
                 email,
                 password,
             });
+            console.log(data);
             set(authAtom, {
                 isLoading: false,
-                access_token: data.access_token,
+                access_token: data.accessToken,
                 error: null,
             });
-        } catch (err) {
-            if (err instanceof AxiosError) {
+        } catch (error) {
+            if (error instanceof AxiosError) {
                 set(authAtom, {
                     isLoading: false,
                     access_token: null,
-                    error: err.response?.data.message,
+                    error: error.response?.data.message,
                 });
             }
         }
     },
 );
 
-export const logoutAtom = atom(null, (_get, set) => {
-    set(authAtom, INITIAL_STATE);
-});
-
 export interface AuthState {
     access_token: string | null;
     isLoading: boolean;
     error: string | null;
-}
-
-export interface LoginRequest {
-    email: string;
-    password: string;
 }

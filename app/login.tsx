@@ -1,53 +1,47 @@
-import { Image, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View, Image } from 'react-native';
 import { Input } from '../shared/Input/Input';
 import { Colors, Gaps } from '../shared/tokens';
 import { Button } from '../shared/Button/Button';
-import { useEffect, useState } from 'react';
 import { ErrorNotification } from '../shared/ErrorNotification/ErrorNotification';
-import CustomLink from '../shared/CustomLink/CustomLink';
+import { useEffect, useState } from 'react';
 import { useAtom } from 'jotai';
 import { loginAtom } from '../entities/auth/model/auth.state';
 import { router } from 'expo-router';
-import CustomButton from '../components/CustomButton';
-import CustomSwitch from '../components/CustomSwitch';
-import SwitchGroup from '../components/SwitchGroup';
-import Selectbox from '../components/CustomSelectbox';
-import IconContainer from '../components/IconContainer';
-// import CustomButton from '../components/CustomButton';
+import CustomLink from '../shared/CustomLink/CustomLink';
 
 export default function Login() {
-    const [localEerror, setLocalError] = useState<string | undefined>();
+    const [localError, setLocalError] = useState<string | undefined>();
     const [email, setEmail] = useState<string>();
     const [password, setPassword] = useState<string>();
     const [{ access_token, isLoading, error }, login] = useAtom(loginAtom);
 
     const submit = () => {
         if (!email) {
-            setLocalError('Не введен email');
+            setLocalError('Не введён email');
             return;
         }
         if (!password) {
-            setLocalError('Не введен password');
+            setLocalError('Не введён пароль');
             return;
         }
         login({ email, password });
     };
 
     useEffect(() => {
-        if (error) setLocalError(error);
+        if (error) {
+            setLocalError(error);
+        }
     }, [error]);
 
     useEffect(() => {
         if (access_token) {
-            router.replace('/(app');
+            router.replace('/(app)');
         }
-    }, []);
-
-    const [selectedValue, setSelectedValue] = useState<string | null>(null);
+    }, [access_token]);
 
     return (
         <View style={styles.container}>
-            <ErrorNotification error={error} />
+            <ErrorNotification error={localError} />
             <View style={styles.content}>
                 <Image
                     style={styles.logo}
@@ -55,12 +49,9 @@ export default function Login() {
                     resizeMode="contain"
                 />
                 <View style={styles.form}>
-                    <Input placeholder="Email" onChangeText={setEmail} />
-                    <Input isPassword placeholder="Password" onChangeText={setPassword} />
-                    <Button text="Войти" isLoading={isLoading} onPress={submit} />
-                </View>
-                <View style={styles.gap}>
-                    <IconContainer />
+                    <Input placeholder="Email" onChangeText={setEmail} secureTextEntry={false} />
+                    <Input isPassword placeholder="Пароль" onChangeText={setPassword} />
+                    <Button text="Войти" onPress={submit} isLoading={isLoading} />
                 </View>
                 <CustomLink href={'/restore'} text="Восстановить пароль" />
             </View>
@@ -71,8 +62,8 @@ export default function Login() {
 const styles = StyleSheet.create({
     container: {
         justifyContent: 'center',
-        padding: 55,
         flex: 1,
+        padding: 55,
         backgroundColor: Colors.black,
     },
     content: {
@@ -85,14 +76,5 @@ const styles = StyleSheet.create({
     },
     logo: {
         width: 220,
-    },
-    gap: {
-        width: 350,
-        height: 250,
-        gap: 10,
-        padding: 50,
-        backgroundColor: 'white',
-        alignItems: 'center',
-        justifyContent: 'center',
     },
 });
